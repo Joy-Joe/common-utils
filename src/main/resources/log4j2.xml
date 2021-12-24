@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF" packages="cn.yto.log">
+    <appenders>
+        <Console name="console">
+            <PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] (%F:%L) >>> %m %n"/>
+        </Console>
+        <RollingFile name="file" fileName="log/exp.log" filePattern="log/%d{yyyy}-exp-%i.zip" append="true">
+            <PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss,SSS} [%t] (%F:%L) >>> %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="1024 MB"/>
+                <!-- 	      		<SizeBasedTriggeringPolicy size="1k"/> -->
+            </Policies>
+            <!--每天早上1点进行检查删除 -->
+            <!--			<CronTriggeringPolicy schedule="0 0 1 * * ?"/>-->
+            <DefaultRolloverStrategy max="15">
+                <!--				<Delete basePath="./logs/station-notify-mq-consumer/" maxDepth="1">-->
+                <!--					<IfFileName glob="*.zip" />-->
+                <!--					&lt;!&ndash;删除15天前的文件&ndash;&gt;-->
+                <!--					<IfLastModified age="7d" />-->
+                <!--				</Delete>-->
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--（error单独输出）-->
+        <RollingFile name="error-file" fileName="log/error.log" filePattern="log/%d{yyyy}-error-%i.zip" append="true">
+            <PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %l >>> %m%n"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/><!--（只接收error单独输出）-->
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="1024 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5">
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+    </appenders>
+
+    <loggers>
+        <!--additivity="true"  若是additivity设为true，则子Logger不止会在自己的appender里输出，还会在root的logger的appender里输出 -->
+        <logger name="error" level="info" additivity="true">
+            <appender-ref ref="console"/>
+            <appender-ref ref="error-file"/>
+        </logger>
+
+        <logger name="com.opensymphony" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <logger name="org.springframework.jdbc.core" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <logger name="net.sf.json" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <logger name="com.ibm.gbs.ai.portal.framework" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <logger name="com.yto.coresystem" level="info" additivity="false">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </logger>
+
+        <!--		<root level="error">-->
+        <!--			<appender-ref ref="console" />-->
+        <!--		</root>-->
+
+        <root level="info">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+            <appender-ref ref="error-file"/><!--（只接收error单独输出）-->
+        </root>
+    </loggers>
+</configuration>
